@@ -66,7 +66,7 @@ function getArticles() {
         tags: Array.isArray(data.tags) ? data.tags : [],
         content: content.trim(),
         slug: slugify(data.title),
-        mtime: fs.statSync(filePath).mtimeMs,
+        ctime: getGitCtime(filePath),
       }
     } catch (e) {
       console.error(`[error] ${filePath}:`, e.message)
@@ -90,7 +90,11 @@ function getArticles() {
     }
   }
 
-  return result.sort((a, b) => b.mtime - a.mtime)
+  // 先按 date 降序，同一天内再按 git 首次提交时间降序（最新提交排最前）
+  return result.sort((a, b) => {
+    if (b.date !== a.date) return b.date.localeCompare(a.date)
+    return b.ctime - a.ctime
+  })
 }
 
 // ─── Markdown 渲染（与 index.html 前端保持一致）────────────────────────────
