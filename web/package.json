@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "build": "node build.js",
     "watch": "node watcher.js",
     "watch:dir": "node watcher.js"
   },
