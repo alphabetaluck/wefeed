@@ -1,13 +1,17 @@
 # WeFeed
 
-个人阅读摘要信息流，将每天读过的文章以 Markdown 格式保存，自动展示为可浏览的 Web 页面。
+凯哥的信息流 —— 将每天读过的文章以 Markdown 格式保存，自动构建为静态站点并部署到 Cloudflare Pages。
+
+- 线上地址：[feed.kai.ge](https://feed.kai.ge)
+- Twitter：[@AlphaBetaLuck](https://x.com/AlphaBetaLuck)
 
 ## 功能
 
-- 以信息流卡片形式展示文章摘要
+- 以信息流卡片形式展示文章摘要，支持点击标题查看详情页
 - 支持按日期筛选
-- 文章新增后自动 git push，触发 Cloudflare Pages 构建静态站点
-- 服务开机自启
+- 文章列表按文件修改时间排序，新增内容自动排在最前
+- 新增文章后自动 git push，触发 Cloudflare Pages 构建静态站点
+- 服务开机自启（systemd）
 
 ## 目录结构
 
@@ -17,11 +21,12 @@ wefeed/
 │   └── 2026-04-17/
 │       └── 文章标题.md
 ├── web/
-│   ├── server.js      # Hono Web 服务器，提供 /api/articles 接口
-│   ├── index.html     # 前端单页应用
-│   ├── watcher.js     # 文件监听脚本，防抖 5 分钟后自动 git push
-│   ├── package.json
-│   └── run.sh
+│   ├── server.js      # Hono 本地预览服务器
+│   ├── build.js       # 静态构建脚本，输出到 dist/
+│   ├── index.html     # 本地预览前端
+│   ├── watcher.js     # 文件监听，防抖 5 分钟后自动 git push
+│   └── package.json
+├── wrangler.toml      # Cloudflare Pages 配置
 ├── .gitignore
 └── README.md
 ```
@@ -38,6 +43,7 @@ title: 文章标题
 url: https://原文链接
 date: 2026-04-17
 source: 来源名称
+author: 作者名
 tags:
   - AI
   - 技术
@@ -52,9 +58,10 @@ tags:
 | `url` | 否 | 原文链接 |
 | `date` | 否 | 日期，放在日期子目录下时可省略 |
 | `source` | 否 | 来源/媒体名称 |
+| `author` | 否 | 作者名 |
 | `tags` | 否 | 标签数组 |
 
-## 本地运行
+## 本地预览
 
 ```bash
 cd web
@@ -69,7 +76,7 @@ node server.js
 
 | 服务 | 说明 |
 |------|------|
-| `wefeed-server` | Web 服务器，端口 17777 |
+| `wefeed-server` | 本地预览服务器，端口 17777 |
 | `wefeed-watcher` | 监听 articles/ 目录，5 分钟防抖后自动 git push |
 
 ```bash
@@ -96,12 +103,22 @@ watcher 检测到变化，重置 5 分钟防抖计时器
         ↓
 git add . → git commit → git push
         ↓
-Cloudflare Pages 自动触发构建
+Cloudflare Pages 自动触发 node build.js
+        ↓
+生成 dist/ 静态文件并部署
 ```
+
+## Cloudflare Pages 构建配置
+
+| 配置项 | 值 |
+|--------|-----|
+| Build command | `cd web && npm install && node build.js` |
+| Build output directory | `dist` |
 
 ## 技术栈
 
-- **后端**：Node.js + [Hono](https://hono.dev/)
-- **前端**：原生 HTML/CSS/JS（无构建工具）
+- **本地服务**：Node.js + [Hono](https://hono.dev/)
+- **静态构建**：自定义 `build.js`（无框架依赖）
+- **部署**：Cloudflare Pages
 - **Markdown 解析**：gray-matter（front matter）+ 自定义正则渲染
 - **字体**：Noto Serif SC / Noto Sans SC
