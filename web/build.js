@@ -263,8 +263,18 @@ const CSS = `
   .article-title {
     font-family: "Noto Serif SC", Georgia, serif;
     font-size: 32px; font-weight: 500;
-    line-height: 1.3; color: var(--anthropic-near-black); margin-bottom: 16px;
+    line-height: 1.3; color: var(--anthropic-near-black); margin-bottom: 10px;
   }
+  .article-meta-line {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 6px 12px; margin-bottom: 10px;
+    font-size: 13px; color: var(--stone-gray);
+  }
+  .article-meta-line .feed-source { color: var(--terracotta); font-weight: 500; }
+  .article-meta-line .feed-author { color: var(--stone-gray); }
+  .article-meta-line .feed-source-link { color: var(--terracotta); }
+  .article-meta-line .feed-date { color: var(--stone-gray); margin-left: auto; }
+  .feed-tags { display: flex; flex-wrap: wrap; gap: 6px; }
   .article-body {
     background: var(--ivory);
     border: 1px solid var(--border-cream);
@@ -442,14 +452,14 @@ function buildArticlePage(article) {
     <div class="container">
       <a href="/" class="back-link">← 返回列表</a>
       <div class="article-header">
-        <div class="feed-source">${article.source || '未知来源'}</div>
         <h1 class="article-title">${article.title}</h1>
-        ${urlHtml}
-        <div class="feed-meta">
-          ${authorHtml}
-          ${tagsHtml}
+        <div class="article-meta-line">
+          ${article.source ? `<span class="feed-source">${article.source}</span>` : ''}
+          ${article.author ? `<span class="feed-author">${article.author}</span>` : ''}
+          ${urlHtml}
           <span class="feed-date">${article.date}</span>
         </div>
+        <div class="feed-tags">${tagsHtml}</div>
       </div>
       <div class="article-body feed-summary">
         <p>${bodyHtml}</p>
