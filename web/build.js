@@ -131,6 +131,15 @@ const CSS = `
     padding: 16px 0; z-index: 100;
   }
   .header-content { display: flex; align-items: center; justify-content: space-between; }
+  .header-links { display: flex; align-items: center; gap: 8px; }
+  .header-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 13px; color: var(--stone-gray);
+    text-decoration: none; padding: 6px 10px;
+    border: 1px solid var(--border-warm); border-radius: 8px;
+    background: var(--warm-sand); transition: all 0.15s ease;
+  }
+  .header-link:hover { background: var(--white); color: var(--anthropic-near-black); box-shadow: 0 0 0 1px var(--border-warm); }
   .logo {
     font-family: "Noto Serif SC", Georgia, serif;
     font-size: 24px; font-weight: 500;
@@ -237,12 +246,7 @@ const CSS = `
     font-size: 16px; line-height: 1.8; color: var(--olive-gray);
   }
   footer { border-top: 1px solid var(--border-cream); padding: 24px 0; }
-  .github-link {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 13px; color: var(--stone-gray);
-    text-decoration: none; transition: color 0.15s ease;
-  }
-  .github-link:hover { color: var(--anthropic-near-black); }
+  .footer-text { font-size: 13px; color: var(--stone-gray); }
   @media (max-width: 640px) {
     .feed-title { font-size: 28px; }
     .feed-item { padding: 20px; border-radius: 12px; }
@@ -258,17 +262,30 @@ const FONT_LINK = `<link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">`
 
-const GITHUB_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.744 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>`
+const GITHUB_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.744 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>`
+
+const TWITTER_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`
 
 function footer() {
   return `
   <footer>
     <div class="container">
-      <a href="https://github.com/alphabetaluck/wefeed" class="github-link" target="_blank" rel="noopener">
-        ${GITHUB_SVG} 开源地址
-      </a>
+      <span class="footer-text">凯哥的信息流 · 每天读过文章的摘要整理</span>
     </div>
   </footer>`
+}
+
+function headerLinks(activeDateFilter = '') {
+  return `
+        <div class="header-links">
+          <a href="https://x.com/AlphaBetaLuck" class="header-link" target="_blank" rel="noopener">
+            ${TWITTER_SVG} Twitter
+          </a>
+          <a href="https://github.com/alphabetaluck/wefeed" class="header-link" target="_blank" rel="noopener">
+            ${GITHUB_SVG} 开源
+          </a>
+          ${activeDateFilter}
+        </div>`
 }
 
 // ─── 生成列表页 index.html ───────────────────────────────────────────────────
@@ -280,6 +297,8 @@ function buildIndex(articles) {
     `<a href="/" class="active">全部</a>`,
     ...dates.map(d => `<a href="/date/${d}/">${d}</a>`)
   ].join('\n          ')
+
+  const dateFilter = `<div class="date-filter">${dateFilterHtml}</div>`
 
   let feedHtml = ''
   articles.forEach((item, i) => {
@@ -294,7 +313,7 @@ function buildIndex(articles) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>信息流 - 阅读摘要</title>
+  <title>凯哥的信息流</title>
   ${FONT_LINK}
   <style>${CSS}</style>
 </head>
@@ -302,10 +321,8 @@ function buildIndex(articles) {
   <header>
     <div class="container">
       <div class="header-content">
-        <a href="/" class="logo">阅读摘要</a>
-        <div class="date-filter">
-          ${dateFilterHtml}
-        </div>
+        <a href="/" class="logo">凯哥的信息流</a>
+        ${headerLinks(`<div class="date-filter">${dateFilterHtml}</div>`)}
       </div>
     </div>
   </header>
@@ -342,7 +359,7 @@ function buildDatePage(date, articles, allDates) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${date} - 阅读摘要</title>
+  <title>${date} - 凯哥的信息流</title>
   ${FONT_LINK}
   <style>${CSS}</style>
 </head>
@@ -350,10 +367,8 @@ function buildDatePage(date, articles, allDates) {
   <header>
     <div class="container">
       <div class="header-content">
-        <a href="/" class="logo">阅读摘要</a>
-        <div class="date-filter">
-          ${dateFilterHtml}
-        </div>
+        <a href="/" class="logo">凯哥的信息流</a>
+        ${headerLinks(`<div class="date-filter">${dateFilterHtml}</div>`)}
       </div>
     </div>
   </header>
@@ -387,7 +402,7 @@ function buildArticlePage(article) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${article.title} - 阅读摘要</title>
+  <title>${article.title} - 凯哥的信息流</title>
   ${FONT_LINK}
   <style>${CSS}</style>
 </head>
@@ -395,7 +410,8 @@ function buildArticlePage(article) {
   <header>
     <div class="container">
       <div class="header-content">
-        <a href="/" class="logo">阅读摘要</a>
+        <a href="/" class="logo">凯哥的信息流</a>
+        ${headerLinks('')}
       </div>
     </div>
   </header>
