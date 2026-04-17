@@ -131,6 +131,7 @@ const CSS = `
     padding: 16px 0; z-index: 100;
   }
   .header-content { display: flex; align-items: center; justify-content: space-between; }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
   .header-links { display: flex; align-items: center; gap: 8px; }
   .header-link {
     display: inline-flex; align-items: center; gap: 5px;
@@ -275,8 +276,10 @@ function footer() {
   </footer>`
 }
 
-function headerLinks(activeDateFilter = '') {
+function headerLinks(dateFilterHtml = '') {
   return `
+      <div class="header-top">
+        <a href="/" class="logo">凯哥的信息流</a>
         <div class="header-links">
           <a href="https://x.com/AlphaBetaLuck" class="header-link" target="_blank" rel="noopener">
             ${TWITTER_SVG} Twitter
@@ -284,8 +287,9 @@ function headerLinks(activeDateFilter = '') {
           <a href="https://github.com/alphabetaluck/wefeed" class="header-link" target="_blank" rel="noopener">
             ${GITHUB_SVG} 开源
           </a>
-          ${activeDateFilter}
-        </div>`
+        </div>
+      </div>
+      ${dateFilterHtml}`
 }
 
 // ─── 生成列表页 index.html ───────────────────────────────────────────────────
@@ -320,10 +324,7 @@ function buildIndex(articles) {
 <body>
   <header>
     <div class="container">
-      <div class="header-content">
-        <a href="/" class="logo">凯哥的信息流</a>
-        ${headerLinks(`<div class="date-filter">${dateFilterHtml}</div>`)}
-      </div>
+      ${headerLinks(`<div class="date-filter">${dateFilterHtml}</div>`)}
     </div>
   </header>
   <main>
@@ -366,10 +367,7 @@ function buildDatePage(date, articles, allDates) {
 <body>
   <header>
     <div class="container">
-      <div class="header-content">
-        <a href="/" class="logo">凯哥的信息流</a>
-        ${headerLinks(`<div class="date-filter">${dateFilterHtml}</div>`)}
-      </div>
+      ${headerLinks(`<div class="date-filter">${dateFilterHtml}</div>`)}
     </div>
   </header>
   <main>
@@ -409,10 +407,7 @@ function buildArticlePage(article) {
 <body>
   <header>
     <div class="container">
-      <div class="header-content">
-        <a href="/" class="logo">凯哥的信息流</a>
-        ${headerLinks('')}
-      </div>
+      ${headerLinks('')}
     </div>
   </header>
   <main>
