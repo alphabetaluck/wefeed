@@ -1,0 +1,16 @@
+{
+  "name": "articles-web",
+  "version": "1.0.0",
+  "description": "信息流阅读摘要 Web 服务",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "watch": "node watcher.js",
+    "watch:dir": "node watcher.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.14",
+    "gray-matter": "^4.0.3",
+    "hono": "^4.12.14"
+  }
+}

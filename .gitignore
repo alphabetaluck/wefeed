@@ -1,0 +1,10 @@
+node_modules/
+*.log
+*.pid
+.DS_Store
+dist/
+logs/
+
+# articles 子目录下的爬取缓存
+articles/**/page.html
+articles/**/page.png
