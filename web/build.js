@@ -49,6 +49,7 @@ function getArticles() {
         tags: Array.isArray(data.tags) ? data.tags : [],
         content: content.trim(),
         slug: slugify(data.title),
+        mtime: fs.statSync(filePath).mtimeMs,
       }
     } catch (e) {
       console.error(`[error] ${filePath}:`, e.message)
@@ -72,7 +73,7 @@ function getArticles() {
     }
   }
 
-  return result.sort((a, b) => b.date.localeCompare(a.date))
+  return result.sort((a, b) => b.mtime - a.mtime)
 }
 
 // ─── Markdown 渲染（与 index.html 前端保持一致）────────────────────────────
