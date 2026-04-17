@@ -12,9 +12,11 @@
 const fs = require('fs')
 const path = require('path')
 const matter = require('gray-matter')
+const { execSync } = require('child_process')
 
 const ARTICLES_ROOT = path.resolve(__dirname, '../articles')
 const DIST_DIR = path.resolve(__dirname, '../dist')
+const REPO_ROOT = path.resolve(__dirname, '..')
 
 // ─── 工具函数 ────────────────────────────────────────────────────────────────
 
@@ -30,6 +32,20 @@ function slugify(str) {
 
 function log(msg) {
   console.log(`[build] ${msg}`)
+}
+
+// 获取文件的 git 首次提交时间戳（秒），不在 git 仓库或未提交则降级用 mtime
+function getGitCtime(filePath) {
+  try {
+    const rel = path.relative(REPO_ROOT, filePath)
+    const out = execSync(
+      `git log --diff-filter=A --follow --format="%ct" -- "${rel}"`,
+      { cwd: REPO_ROOT, stdio: ['pipe', 'pipe', 'ignore'] }
+    ).toString().trim()
+    const ts = parseInt(out.split('\n').pop(), 10)
+    if (!isNaN(ts)) return ts * 1000
+  } catch (_) {}
+  return fs.statSync(filePath).mtimeMs
 }
 
 // ─── 读取文章 ────────────────────────────────────────────────────────────────
