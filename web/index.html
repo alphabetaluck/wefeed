@@ -300,6 +300,11 @@
       color: var(--stone-gray);
     }
 
+    .feed-author {
+      font-size: 12px;
+      color: var(--stone-gray);
+    }
+
     .feed-date {
       font-size: 12px;
       color: var(--stone-gray);
@@ -463,6 +468,9 @@
         const urlHtml = item.url
           ? `<a href="${item.url}" class="feed-source-link" target="_blank" rel="noopener">原文链接</a>`
           : '';
+        const authorHtml = item.author
+          ? `<span class="feed-author">✍ ${item.author}</span>`
+          : '';
 
         html += `
           <article class="feed-item">
@@ -471,6 +479,7 @@
             ${urlHtml}
             <div class="feed-summary"><div class="summary-item">${bodyHtml}</div></div>
             <div class="feed-meta">
+              ${authorHtml}
               ${tagsHtml}
               <span class="feed-date">${item.date}</span>
             </div>

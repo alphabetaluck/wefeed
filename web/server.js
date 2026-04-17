@@ -38,6 +38,7 @@ function getArticles() {
         url: data.url || '',
         date: formatDate(data.date) || fallbackDate || '',
         source: data.source || '',
+        author: data.author || '',
         tags: Array.isArray(data.tags) ? data.tags : [],
         content: content.trim(),
       };

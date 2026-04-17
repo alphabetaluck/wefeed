@@ -46,6 +46,7 @@ function getArticles() {
         url: data.url || '',
         date: formatDate(data.date) || fallbackDate || '',
         source: data.source || '',
+        author: data.author || '',
         tags: Array.isArray(data.tags) ? data.tags : [],
         content: content.trim(),
         slug: slugify(data.title),
@@ -227,6 +228,7 @@ const CSS = `
     border-top: 1px solid var(--border-cream);
   }
   .feed-tag { font-size: 12px; color: var(--stone-gray); }
+  .feed-author { font-size: 12px; color: var(--stone-gray); }
   .feed-date { font-size: 12px; color: var(--stone-gray); }
   .section-divider { width: 100%; height: 1px; background: var(--border-warm); margin: 48px 0; }
   .back-link {
@@ -395,6 +397,9 @@ function buildArticlePage(article) {
   const urlHtml = article.url
     ? `<a href="${article.url}" class="feed-source-link" target="_blank" rel="noopener">原文链接</a>`
     : ''
+  const authorHtml = article.author
+    ? `<span class="feed-author">✍ ${article.author}</span>`
+    : ''
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -419,6 +424,7 @@ function buildArticlePage(article) {
         <h1 class="article-title">${article.title}</h1>
         ${urlHtml}
         <div class="feed-meta">
+          ${authorHtml}
           ${tagsHtml}
           <span class="feed-date">${article.date}</span>
         </div>
@@ -441,6 +447,9 @@ function articleCard(item) {
   const urlHtml = item.url
     ? `<a href="${item.url}" class="feed-source-link" target="_blank" rel="noopener">原文链接</a>`
     : ''
+  const authorHtml = item.author
+    ? `<span class="feed-author">✍ ${item.author}</span>`
+    : ''
 
   return `
   <article class="feed-item">
@@ -451,6 +460,7 @@ function articleCard(item) {
     ${urlHtml}
     <div class="feed-summary"><p>${bodyHtml}</p></div>
     <div class="feed-meta">
+      ${authorHtml}
       ${tagsHtml}
       <span class="feed-date">${item.date}</span>
     </div>
