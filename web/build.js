@@ -273,15 +273,19 @@ const CSS = `
     font-size: 13px; color: var(--stone-gray);
   }
   .article-meta-line .feed-source {
-    color: var(--terracotta); font-weight: 500;
+    color: var(--stone-gray); font-weight: 400;
     font-size: 13px; letter-spacing: 0; text-transform: none; margin-bottom: 0;
   }
   .article-meta-line .feed-source::after { content: "·"; margin-left: 10px; color: var(--stone-gray); font-weight: 400; }
   .article-meta-line .feed-author { color: var(--stone-gray); font-size: 13px; }
-  .article-meta-line .feed-author:not(:last-child)::after { content: "·"; margin-left: 10px; }
+  .article-meta-line .feed-author::after { content: "·"; margin-left: 10px; }
   .article-meta-line .feed-source-link { color: var(--terracotta); margin-bottom: 0; font-size: 13px; }
-  .article-meta-line .feed-date { color: var(--stone-gray); font-size: 13px; }
-  .feed-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-cream); }
+  .article-meta-line .feed-date { color: var(--stone-gray); font-size: 13px; margin-left: auto; }
+  .feed-tags {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+    margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-cream);
+  }
+  .feed-tags .feed-source-link { margin-left: auto; }
   .article-body {
     background: var(--ivory);
     border: 1px solid var(--border-cream);
@@ -463,10 +467,9 @@ function buildArticlePage(article) {
         <div class="article-meta-line">
           ${article.source ? `<span class="feed-source">${article.source}</span>` : ''}
           ${article.author ? `<span class="feed-author">${article.author}</span>` : ''}
-          ${urlHtml}
           <span class="feed-date">${article.date}</span>
         </div>
-        <div class="feed-tags">${tagsHtml}</div>
+        <div class="feed-tags">${tagsHtml}${urlHtml}</div>
       </div>
       <div class="article-body feed-summary">
         <p>${bodyHtml}</p>
@@ -498,11 +501,10 @@ function articleCard(item) {
     <div class="article-meta-line">
       ${item.source ? `<span class="feed-source">${item.source}</span>` : ''}
       ${item.author ? `<span class="feed-author">${item.author}</span>` : ''}
-      ${urlHtml}
       <span class="feed-date">${item.date}</span>
     </div>
     <div class="feed-summary"><p>${bodyHtml}</p></div>
-    <div class="feed-tags">${tagsHtml}</div>
+    <div class="feed-tags">${tagsHtml}${urlHtml}</div>
   </article>`
 }
 
