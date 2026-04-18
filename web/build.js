@@ -273,6 +273,7 @@ const CSS = `
     font-size: 13px; color: var(--stone-gray);
   }
   .feed-source-author { color: var(--stone-gray); font-size: 13px; }
+  .article-meta-line .feed-source-link { color: var(--terracotta); font-size: 13px; margin-bottom: 0; margin-left: auto; }
   .article-meta-line .feed-date { color: var(--stone-gray); font-size: 13px; margin-left: auto; }
   .feed-tags {
     display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
