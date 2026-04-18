@@ -268,18 +268,11 @@ const CSS = `
     line-height: 1.3; color: var(--anthropic-near-black); margin-bottom: 10px;
   }
   .article-meta-line {
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: 4px 10px; margin-bottom: 16px;
+    display: flex; align-items: center;
+    gap: 8px; margin-bottom: 16px;
     font-size: 13px; color: var(--stone-gray);
   }
-  .article-meta-line .feed-source {
-    color: var(--stone-gray); font-weight: 400;
-    font-size: 13px; letter-spacing: 0; text-transform: none; margin-bottom: 0;
-  }
-  .article-meta-line .feed-source::after { content: "·"; margin-left: 10px; color: var(--stone-gray); font-weight: 400; }
-  .article-meta-line .feed-author { color: var(--stone-gray); font-size: 13px; }
-  .article-meta-line .feed-author::after { content: "·"; margin-left: 10px; }
-  .article-meta-line .feed-source-link { color: var(--terracotta); margin-bottom: 0; font-size: 13px; }
+  .feed-source-author { color: var(--stone-gray); font-size: 13px; }
   .article-meta-line .feed-date { color: var(--stone-gray); font-size: 13px; margin-left: auto; }
   .feed-tags {
     display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
@@ -440,9 +433,7 @@ function buildArticlePage(article) {
   const urlHtml = article.url
     ? `<a href="${article.url}" class="feed-source-link" target="_blank" rel="noopener">原文链接</a>`
     : ''
-  const authorHtml = article.author
-    ? `<span class="feed-author">✍ ${article.author}</span>`
-    : ''
+  const sourceAuthor = [article.source, article.author].filter(Boolean).join(' - ')
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -465,8 +456,7 @@ function buildArticlePage(article) {
       <div class="article-header">
         <h1 class="article-title">${article.title}</h1>
         <div class="article-meta-line">
-          ${article.source ? `<span class="feed-source">${article.source}</span>` : ''}
-          ${article.author ? `<span class="feed-author">${article.author}</span>` : ''}
+          ${sourceAuthor ? `<span class="feed-source-author">${sourceAuthor}</span>` : ''}
           <span class="feed-date">${article.date}</span>
         </div>
         <div class="feed-tags">${tagsHtml}${urlHtml}</div>
@@ -489,9 +479,7 @@ function articleCard(item) {
   const urlHtml = item.url
     ? `<a href="${item.url}" class="feed-source-link" target="_blank" rel="noopener">原文链接</a>`
     : ''
-  const authorHtml = item.author
-    ? `<span class="feed-author">✍ ${item.author}</span>`
-    : ''
+  const sourceAuthor = [item.source, item.author].filter(Boolean).join(' - ')
 
   return `
   <article class="feed-item">
@@ -499,8 +487,7 @@ function articleCard(item) {
       <a href="/article/${item.slug}/">${item.title}</a>
     </h2>
     <div class="article-meta-line">
-      ${item.source ? `<span class="feed-source">${item.source}</span>` : ''}
-      ${item.author ? `<span class="feed-author">${item.author}</span>` : ''}
+      ${sourceAuthor ? `<span class="feed-source-author">${sourceAuthor}</span>` : ''}
       <span class="feed-date">${item.date}</span>
     </div>
     <div class="feed-summary"><p>${bodyHtml}</p></div>
