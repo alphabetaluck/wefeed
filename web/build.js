@@ -27,7 +27,7 @@ function formatDate(raw) {
 }
 
 function slugify(str) {
-  return encodeURIComponent(str.trim().replace(/\s+/g, '-'))
+  return str.trim().replace(/\s+/g, '-')
 }
 
 function log(msg) {
@@ -621,10 +621,10 @@ function build() {
   fs.writeFileSync(path.join(DIST_DIR, 'tags', 'index.html'), buildTagsIndex(tagMap), 'utf-8')
   log('生成 tags/index.html')
   for (const [tag, tagArticles] of Object.entries(tagMap)) {
-    const dir = path.join(DIST_DIR, 'tag', encodeURIComponent(tag))
+    const dir = path.join(DIST_DIR, 'tag', tag)
     fs.mkdirSync(dir, { recursive: true })
     fs.writeFileSync(path.join(dir, 'index.html'), buildTagPage(tag, tagArticles), 'utf-8')
-    log(`生成 tag/${encodeURIComponent(tag)}/index.html`)
+    log(`生成 tag/${tag}/index.html`)
   }
 
   // 生成 404 页
