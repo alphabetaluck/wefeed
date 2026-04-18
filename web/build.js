@@ -202,21 +202,21 @@ const CSS = `
     letter-spacing: 0.12px; text-transform: uppercase;
     color: var(--stone-gray); margin-bottom: 8px;
   }
-  .feed-item-title {
+   .feed-item-title {
     font-family: "Noto Serif SC", Georgia, serif;
     font-size: 20px; font-weight: 500;
-    line-height: 1.3; color: var(--anthropic-near-black); margin-bottom: 12px;
+    line-height: 1.3; color: var(--anthropic-near-black); margin-bottom: 8px;
   }
   .feed-item-title a { color: inherit; text-decoration: none; }
   .feed-item-title a:hover { color: var(--terracotta); }
   .feed-source-link {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 14px; color: var(--terracotta);
-    text-decoration: none; margin-bottom: 12px;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 13px; color: var(--terracotta);
+    text-decoration: none;
   }
   .feed-source-link:hover { color: var(--coral); }
-  .feed-source-link::after { content: "↗"; font-size: 12px; }
-  .feed-summary { font-size: 16px; line-height: 1.7; color: var(--olive-gray); }
+  .feed-source-link::after { content: "↗"; font-size: 11px; }
+  .feed-summary { font-size: 15px; line-height: 1.7; color: var(--olive-gray); margin-top: 14px; }
   .feed-summary p { margin-bottom: 12px; }
   .feed-summary p:last-child { margin-bottom: 0; }
   .feed-summary h2, .feed-summary h3, .feed-summary h4 {
@@ -247,9 +247,13 @@ const CSS = `
     margin-top: 16px; padding-top: 16px;
     border-top: 1px solid var(--border-cream);
   }
-  .feed-tag { font-size: 12px; color: var(--stone-gray); }
-  .feed-author { font-size: 12px; color: var(--stone-gray); }
-  .feed-date { font-size: 12px; color: var(--stone-gray); }
+  .feed-tag {
+    font-size: 12px; color: var(--stone-gray);
+    background: var(--parchment); border: 1px solid var(--border-cream);
+    border-radius: 4px; padding: 2px 8px;
+  }
+  .feed-author { font-size: 13px; color: var(--stone-gray); }
+  .feed-date { font-size: 13px; color: var(--stone-gray); }
   .section-divider { width: 100%; height: 1px; background: var(--border-warm); margin: 48px 0; }
   .back-link {
     display: inline-flex; align-items: center; gap: 6px;
@@ -265,14 +269,19 @@ const CSS = `
   }
   .article-meta-line {
     display: flex; flex-wrap: wrap; align-items: center;
-    gap: 6px 12px; margin-bottom: 10px;
+    gap: 4px 10px; margin-bottom: 16px;
     font-size: 13px; color: var(--stone-gray);
   }
-  .article-meta-line .feed-source { color: var(--terracotta); font-weight: 500; }
-  .article-meta-line .feed-author { color: var(--stone-gray); }
+  .article-meta-line .feed-source {
+    color: var(--terracotta); font-weight: 500;
+    font-size: 13px; letter-spacing: 0; text-transform: none; margin-bottom: 0;
+  }
+  .article-meta-line .feed-source::after { content: "·"; margin-left: 10px; color: var(--stone-gray); font-weight: 400; }
+  .article-meta-line .feed-author { color: var(--stone-gray); font-size: 13px; }
+  .article-meta-line .feed-author:not(:last-child)::after { content: "·"; margin-left: 10px; }
   .article-meta-line .feed-source-link { color: var(--terracotta); margin-bottom: 0; font-size: 13px; }
-  .article-meta-line .feed-date { color: var(--stone-gray); }
-  .feed-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .article-meta-line .feed-date { color: var(--stone-gray); font-size: 13px; }
+  .feed-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-cream); }
   .article-body {
     background: var(--ivory);
     border: 1px solid var(--border-cream);
