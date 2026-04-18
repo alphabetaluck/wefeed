@@ -64,7 +64,7 @@ function getArticles() {
         source: data.source || '',
         author: data.author || '',
         tags: Array.isArray(data.tags) ? data.tags : [],
-        content: content.trim(),
+        content: content.trim().replace(/^"""\n?/, '').replace(/\n?"""$/, '').trim(),
         slug: slugify(data.title),
         ctime: getGitCtime(filePath),
       }
