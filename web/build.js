@@ -27,9 +27,7 @@ function formatDate(raw) {
 }
 
 function slugify(str) {
-  // Use raw title (with Chinese chars) as slug so CF Pages can match directory
-  // names directly after URL-decoding the request path.
-  return str.trim().replace(/\s+/g, '-')
+  return encodeURIComponent(str.trim().replace(/\s+/g, '-'))
 }
 
 function log(msg) {
