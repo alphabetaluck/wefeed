@@ -271,7 +271,7 @@ const CSS = `
   .article-meta-line .feed-source { color: var(--terracotta); font-weight: 500; }
   .article-meta-line .feed-author { color: var(--stone-gray); }
   .article-meta-line .feed-source-link { color: var(--terracotta); margin-bottom: 0; font-size: 13px; }
-  .article-meta-line .feed-date { color: var(--stone-gray); margin-left: auto; }
+  .article-meta-line .feed-date { color: var(--stone-gray); }
   .feed-tags { display: flex; flex-wrap: wrap; gap: 6px; }
   .article-body {
     background: var(--ivory);
