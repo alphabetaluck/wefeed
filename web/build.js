@@ -278,7 +278,7 @@ const CSS = `
     display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
     margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-cream);
   }
-  .feed-tags .feed-source-link { margin-left: auto; }
+  .feed-tags .feed-date { margin-left: auto; font-size: 13px; color: var(--stone-gray); }
   .article-body {
     background: var(--ivory);
     border: 1px solid var(--border-cream);
@@ -457,9 +457,9 @@ function buildArticlePage(article) {
         <h1 class="article-title">${article.title}</h1>
         <div class="article-meta-line">
           ${sourceAuthor ? `<span class="feed-source-author">${sourceAuthor}</span>` : ''}
-          <span class="feed-date">${article.date}</span>
+          ${urlHtml}
         </div>
-        <div class="feed-tags">${tagsHtml}${urlHtml}</div>
+        <div class="feed-tags">${tagsHtml}<span class="feed-date">${article.date}</span></div>
       </div>
       <div class="article-body feed-summary">
         <p>${bodyHtml}</p>
@@ -488,10 +488,10 @@ function articleCard(item) {
     </h2>
     <div class="article-meta-line">
       ${sourceAuthor ? `<span class="feed-source-author">${sourceAuthor}</span>` : ''}
-      <span class="feed-date">${item.date}</span>
+      ${urlHtml}
     </div>
     <div class="feed-summary"><p>${bodyHtml}</p></div>
-    <div class="feed-tags">${tagsHtml}${urlHtml}</div>
+    <div class="feed-tags">${tagsHtml}<span class="feed-date">${item.date}</span></div>
   </article>`
 }
 
