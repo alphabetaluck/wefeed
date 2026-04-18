@@ -483,17 +483,17 @@ function articleCard(item) {
 
   return `
   <article class="feed-item">
-    <div class="feed-source">${item.source || '未知来源'}</div>
     <h2 class="feed-item-title">
       <a href="/article/${item.slug}/">${item.title}</a>
     </h2>
-    ${urlHtml}
-    <div class="feed-summary"><p>${bodyHtml}</p></div>
-    <div class="feed-meta">
-      ${authorHtml}
-      ${tagsHtml}
+    <div class="article-meta-line">
+      ${item.source ? `<span class="feed-source">${item.source}</span>` : ''}
+      ${item.author ? `<span class="feed-author">${item.author}</span>` : ''}
+      ${urlHtml}
       <span class="feed-date">${item.date}</span>
     </div>
+    <div class="feed-summary"><p>${bodyHtml}</p></div>
+    <div class="feed-tags">${tagsHtml}</div>
   </article>`
 }
 
