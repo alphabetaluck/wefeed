@@ -627,6 +627,31 @@ function build() {
     log(`生成 tag/${encodeURIComponent(tag)}/index.html`)
   }
 
+  // 生成 404 页
+  const notFoundHtml = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>页面不存在 - 凯哥的信息流</title>
+  ${FONT_LINK}
+  <style>${CSS}</style>
+</head>
+<body>
+  <header><div class="container">${headerLinks()}</div></header>
+  <main>
+    <div class="container" style="padding-top:80px;text-align:center;">
+      <p style="font-size:64px;margin-bottom:16px;">404</p>
+      <p style="color:var(--stone-gray);margin-bottom:32px;">页面不存在</p>
+      <a href="/" style="color:var(--terracotta);text-decoration:none;">← 返回首页</a>
+    </div>
+  </main>
+  ${footer()}
+</body>
+</html>`
+  fs.writeFileSync(path.join(DIST_DIR, '404.html'), notFoundHtml, 'utf-8')
+  log('生成 404.html')
+
   log(`\n构建完成，共生成 ${1 + dates.length + articles.length + 1 + Object.keys(tagMap).length} 个 HTML 文件`)
 }
 
