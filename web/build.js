@@ -251,7 +251,9 @@ const CSS = `
     font-size: 12px; color: var(--stone-gray);
     background: var(--parchment); border: 1px solid var(--border-cream);
     border-radius: 4px; padding: 2px 8px;
+    text-decoration: none; transition: all 0.15s ease;
   }
+  .feed-tag:hover { background: var(--white); color: var(--anthropic-near-black); border-color: var(--border-warm); }
   .feed-author { font-size: 13px; color: var(--stone-gray); }
   .feed-date { font-size: 13px; color: var(--stone-gray); }
   .section-divider { width: 100%; height: 1px; background: var(--border-warm); margin: 48px 0; }
@@ -321,6 +323,7 @@ function headerLinks(dateFilterHtml = '') {
       <div class="header-top">
         <a href="/" class="logo">凯哥的信息流</a>
         <div class="header-links">
+          <a href="/tags/" class="header-link">标签</a>
           <a href="https://x.com/AlphaBetaLuck" class="header-link" target="_blank" rel="noopener">
             ${TWITTER_SVG} Twitter
           </a>
@@ -430,7 +433,7 @@ function buildDatePage(date, articles, allDates) {
 
 function buildArticlePage(article) {
   const bodyHtml = parseMd(article.content)
-  const tagsHtml = article.tags.map(t => `<span class="feed-tag">${t}</span>`).join('')
+  const tagsHtml = article.tags.map(t => `<a href="/tag/${encodeURIComponent(t)}/" class="feed-tag">${t}</a>`).join('')
   const urlHtml = article.url
     ? `<a href="${article.url}" class="feed-source-link" target="_blank" rel="noopener">原文链接</a>`
     : ''
@@ -476,7 +479,7 @@ function buildArticlePage(article) {
 
 function articleCard(item) {
   const bodyHtml = parseMd(item.content)
-  const tagsHtml = item.tags.map(t => `<span class="feed-tag">${t}</span>`).join('')
+  const tagsHtml = item.tags.map(t => `<a href="/tag/${encodeURIComponent(t)}/" class="feed-tag">${t}</a>`).join('')
   const urlHtml = item.url
     ? `<a href="${item.url}" class="feed-source-link" target="_blank" rel="noopener">原文链接</a>`
     : ''
@@ -496,6 +499,76 @@ function articleCard(item) {
   </article>`
 }
 
+// ─── 标签汇总页 /tags/index.html ─────────────────────────────────────────────
+
+function buildTagsIndex(tagMap) {
+  const sorted = Object.entries(tagMap).sort((a, b) => b[1].length - a[1].length)
+  const tagsHtml = sorted.map(([tag, arts]) =>
+    `<a href="/tag/${encodeURIComponent(tag)}/" class="tag-item">
+      <span class="tag-name">${tag}</span>
+      <span class="tag-count">${arts.length}</span>
+    </a>`
+  ).join('\n    ')
+
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>标签 - 凯哥的信息流</title>
+  ${FONT_LINK}
+  <style>${CSS}
+  .tags-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+  .tag-item { display: flex; align-items: center; gap: 6px; text-decoration: none;
+    padding: 6px 14px; border: 1px solid var(--border-warm); border-radius: 8px;
+    background: var(--ivory); color: var(--charcoal-warm); font-size: 14px;
+    transition: all 0.15s ease; }
+  .tag-item:hover { background: var(--white); box-shadow: 0 0 0 1px var(--border-warm); color: var(--anthropic-near-black); }
+  .tag-count { font-size: 12px; color: var(--stone-gray); background: var(--parchment);
+    border-radius: 10px; padding: 1px 7px; }
+  </style>
+</head>
+<body>
+  <header><div class="container">${headerLinks()}</div></header>
+  <main>
+    <div class="container">
+      <h1 style="font-family:'Noto Serif SC',serif;font-size:28px;font-weight:500;margin-bottom:8px;">标签</h1>
+      <p style="color:var(--stone-gray);font-size:14px;">共 ${sorted.length} 个标签</p>
+      <div class="tags-grid">${tagsHtml}</div>
+    </div>
+  </main>
+  ${footer()}
+</body>
+</html>`
+}
+
+// ─── 标签文章页 /tag/[tag]/index.html ────────────────────────────────────────
+
+function buildTagPage(tag, articles) {
+  const feedHtml = articles.map(item => articleCard(item)).join('\n')
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${tag} - 凯哥的信息流</title>
+  ${FONT_LINK}
+  <style>${CSS}</style>
+</head>
+<body>
+  <header><div class="container">${headerLinks()}</div></header>
+  <main>
+    <div class="container">
+      <a href="/tags/" class="back-link">← 所有标签</a>
+      <h1 style="font-family:'Noto Serif SC',serif;font-size:28px;font-weight:500;margin-bottom:24px;"># ${tag}</h1>
+      ${feedHtml}
+    </div>
+  </main>
+  ${footer()}
+</body>
+</html>`
+}
+
 // ─── 主构建流程 ──────────────────────────────────────────────────────────────
 
 function build() {
@@ -510,6 +583,8 @@ function build() {
   fs.mkdirSync(DIST_DIR, { recursive: true })
   fs.mkdirSync(path.join(DIST_DIR, 'article'), { recursive: true })
   fs.mkdirSync(path.join(DIST_DIR, 'date'), { recursive: true })
+  fs.mkdirSync(path.join(DIST_DIR, 'tags'), { recursive: true })
+  fs.mkdirSync(path.join(DIST_DIR, 'tag'), { recursive: true })
 
   const articles = getArticles()
   log(`读取到 ${articles.length} 篇文章`)
@@ -535,7 +610,24 @@ function build() {
     log(`生成 article/${article.slug}/index.html`)
   }
 
-  log(`\n构建完成，共生成 ${1 + dates.length + articles.length} 个 HTML 文件`)
+  // 生成标签页
+  const tagMap = {}
+  for (const article of articles) {
+    for (const tag of article.tags) {
+      if (!tagMap[tag]) tagMap[tag] = []
+      tagMap[tag].push(article)
+    }
+  }
+  fs.writeFileSync(path.join(DIST_DIR, 'tags', 'index.html'), buildTagsIndex(tagMap), 'utf-8')
+  log('生成 tags/index.html')
+  for (const [tag, tagArticles] of Object.entries(tagMap)) {
+    const dir = path.join(DIST_DIR, 'tag', encodeURIComponent(tag))
+    fs.mkdirSync(dir, { recursive: true })
+    fs.writeFileSync(path.join(dir, 'index.html'), buildTagPage(tag, tagArticles), 'utf-8')
+    log(`生成 tag/${encodeURIComponent(tag)}/index.html`)
+  }
+
+  log(`\n构建完成，共生成 ${1 + dates.length + articles.length + 1 + Object.keys(tagMap).length} 个 HTML 文件`)
 }
 
 build()
