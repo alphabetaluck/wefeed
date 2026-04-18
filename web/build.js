@@ -11,6 +11,7 @@
 
 const fs = require('fs')
 const path = require('path')
+const crypto = require('crypto')
 const matter = require('gray-matter')
 const { execSync } = require('child_process')
 
@@ -26,8 +27,18 @@ function formatDate(raw) {
   return String(raw).slice(0, 10)
 }
 
+// 生成纯 ASCII 短 hash slug（8 字符 hex），避免中文路径在 CF Workers 上 404
 function slugify(str) {
-  return str.trim().replace(/\s+/g, '-')
+  return crypto.createHash('md5').update(str.trim()).digest('hex').slice(0, 8)
+}
+
+// tag 名 → 纯 ASCII slug
+function tagSlug(tag) {
+  // 纯 ASCII tag 直接用原名（小写化、空格转连字符）
+  if (/^[\x20-\x7e]+$/.test(tag)) {
+    return tag.trim().toLowerCase().replace(/\s+/g, '-')
+  }
+  return crypto.createHash('md5').update(tag.trim()).digest('hex').slice(0, 8)
 }
 
 function log(msg) {
@@ -433,7 +444,7 @@ function buildDatePage(date, articles, allDates) {
 
 function buildArticlePage(article) {
   const bodyHtml = parseMd(article.content)
-  const tagsHtml = article.tags.map(t => `<a href="/tag/${encodeURIComponent(t)}/" class="feed-tag">${t}</a>`).join('')
+  const tagsHtml = article.tags.map(t => `<a href="/tag/${tagSlug(t)}/" class="feed-tag">${t}</a>`).join('')
   const urlHtml = article.url
     ? `<a href="${article.url}" class="feed-source-link" target="_blank" rel="noopener">原文链接</a>`
     : ''
@@ -479,7 +490,7 @@ function buildArticlePage(article) {
 
 function articleCard(item) {
   const bodyHtml = parseMd(item.content)
-  const tagsHtml = item.tags.map(t => `<a href="/tag/${encodeURIComponent(t)}/" class="feed-tag">${t}</a>`).join('')
+  const tagsHtml = item.tags.map(t => `<a href="/tag/${tagSlug(t)}/" class="feed-tag">${t}</a>`).join('')
   const urlHtml = item.url
     ? `<a href="${item.url}" class="feed-source-link" target="_blank" rel="noopener">原文链接</a>`
     : ''
@@ -504,7 +515,7 @@ function articleCard(item) {
 function buildTagsIndex(tagMap) {
   const sorted = Object.entries(tagMap).sort((a, b) => b[1].length - a[1].length)
   const tagsHtml = sorted.map(([tag, arts]) =>
-    `<a href="/tag/${encodeURIComponent(tag)}/" class="tag-item">
+    `<a href="/tag/${tagSlug(tag)}/" class="tag-item">
       <span class="tag-name">${tag}</span>
       <span class="tag-count">${arts.length}</span>
     </a>`
@@ -621,10 +632,10 @@ function build() {
   fs.writeFileSync(path.join(DIST_DIR, 'tags', 'index.html'), buildTagsIndex(tagMap), 'utf-8')
   log('生成 tags/index.html')
   for (const [tag, tagArticles] of Object.entries(tagMap)) {
-    const dir = path.join(DIST_DIR, 'tag', tag)
+    const dir = path.join(DIST_DIR, 'tag', tagSlug(tag))
     fs.mkdirSync(dir, { recursive: true })
     fs.writeFileSync(path.join(dir, 'index.html'), buildTagPage(tag, tagArticles), 'utf-8')
-    log(`生成 tag/${tag}/index.html`)
+    log(`生成 tag/${tagSlug(tag)}/index.html (${tag})`)
   }
 
   // 生成 404 页
