@@ -27,7 +27,7 @@ function formatDate(raw) {
 }
 
 function slugify(str) {
-  return encodeURIComponent(str.trim().replace(/\s+/g, '-'))
+  return str.trim().replace(/\s+/g, '-')
 }
 
 function log(msg) {
@@ -433,7 +433,7 @@ function buildDatePage(date, articles, allDates) {
 
 function buildArticlePage(article) {
   const bodyHtml = parseMd(article.content)
-  const tagsHtml = article.tags.map(t => `<a href="/tag/${encodeURIComponent(t)}/" class="feed-tag">${t}</a>`).join('')
+  const tagsHtml = article.tags.map(t => `<a href="/tag/${t}/" class="feed-tag">${t}</a>`).join('')
   const urlHtml = article.url
     ? `<a href="${article.url}" class="feed-source-link" target="_blank" rel="noopener">原文链接</a>`
     : ''
@@ -479,7 +479,7 @@ function buildArticlePage(article) {
 
 function articleCard(item) {
   const bodyHtml = parseMd(item.content)
-  const tagsHtml = item.tags.map(t => `<a href="/tag/${encodeURIComponent(t)}/" class="feed-tag">${t}</a>`).join('')
+  const tagsHtml = item.tags.map(t => `<a href="/tag/${t}/" class="feed-tag">${t}</a>`).join('')
   const urlHtml = item.url
     ? `<a href="${item.url}" class="feed-source-link" target="_blank" rel="noopener">原文链接</a>`
     : ''
@@ -504,7 +504,7 @@ function articleCard(item) {
 function buildTagsIndex(tagMap) {
   const sorted = Object.entries(tagMap).sort((a, b) => b[1].length - a[1].length)
   const tagsHtml = sorted.map(([tag, arts]) =>
-    `<a href="/tag/${encodeURIComponent(tag)}/" class="tag-item">
+    `<a href="/tag/${tag}/" class="tag-item">
       <span class="tag-name">${tag}</span>
       <span class="tag-count">${arts.length}</span>
     </a>`
@@ -621,10 +621,10 @@ function build() {
   fs.writeFileSync(path.join(DIST_DIR, 'tags', 'index.html'), buildTagsIndex(tagMap), 'utf-8')
   log('生成 tags/index.html')
   for (const [tag, tagArticles] of Object.entries(tagMap)) {
-    const dir = path.join(DIST_DIR, 'tag', encodeURIComponent(tag))
+    const dir = path.join(DIST_DIR, 'tag', tag)
     fs.mkdirSync(dir, { recursive: true })
     fs.writeFileSync(path.join(dir, 'index.html'), buildTagPage(tag, tagArticles), 'utf-8')
-    log(`生成 tag/${encodeURIComponent(tag)}/index.html`)
+    log(`生成 tag/${tag}/index.html`)
   }
 
   // 生成 404 页
