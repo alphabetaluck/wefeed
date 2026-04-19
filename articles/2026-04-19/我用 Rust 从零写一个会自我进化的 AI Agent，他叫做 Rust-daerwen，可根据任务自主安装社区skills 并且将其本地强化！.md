@@ -1,5 +1,5 @@
 ---
-title: "我用 Rust 从零写一个会自我进化的 AI Agent，他叫做 Rust-daerwen，可根据任务自主安装社区skills 并且将其本地强化！"
+title: "自我进化的 Rust Agent"
 author: "小张"
 date: 2026-04-19
 url: "https://mp.weixin.qq.com/s/vWIdPGHR1Hq2qlv0lMg4Aw"
