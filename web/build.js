@@ -18,6 +18,7 @@ const { execSync } = require('child_process')
 const ARTICLES_ROOT = path.resolve(__dirname, '../articles')
 const DIST_DIR = path.resolve(__dirname, '../dist')
 const REPO_ROOT = path.resolve(__dirname, '..')
+const PAGE_SIZE = 15
 
 // ─── 工具函数 ────────────────────────────────────────────────────────────────
 
@@ -301,6 +302,17 @@ const CSS = `
   }
   footer { border-top: 1px solid var(--border-cream); padding: 24px 0; }
   .footer-text { font-size: 13px; color: var(--stone-gray); }
+  .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 48px 0 24px; flex-wrap: wrap; }
+  .pagination a, .pagination span {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 36px; height: 36px; padding: 0 10px;
+    border-radius: 8px; font-size: 14px; font-family: var(--font-sans); text-decoration: none;
+    border: 1px solid var(--border-warm); color: var(--olive-gray);
+    transition: background 0.15s, color 0.15s;
+  }
+  .pagination a:hover { background: var(--parchment-mid); color: var(--ink-dark); }
+  .pagination .current { background: var(--terracotta); color: #fff; border-color: var(--terracotta); font-weight: 500; }
+  .pagination .disabled { opacity: 0.35; pointer-events: none; }
   @media (max-width: 640px) {
     .feed-title { font-size: 28px; }
     .feed-item { padding: 20px; border-radius: 12px; }
@@ -346,32 +358,51 @@ function headerLinks(dateFilterHtml = '') {
       ${dateFilterHtml}`
 }
 
-// ─── 生成列表页 index.html ───────────────────────────────────────────────────
+// ─── 生成列表页（支持分页）────────────────────────────────────────────────────
 
-function buildIndex(articles) {
-  const dates = [...new Set(articles.map(a => a.date))].sort().reverse()
+function paginationHtml(pageNum, totalPages) {
+  if (totalPages <= 1) return ''
+  const prev = pageNum > 1
+    ? `<a href="${pageNum === 2 ? '/' : `/page/${pageNum - 1}/`}">← 上一页</a>`
+    : `<span class="disabled">← 上一页</span>`
+  const next = pageNum < totalPages
+    ? `<a href="/page/${pageNum + 1}/">下一页 →</a>`
+    : `<span class="disabled">下一页 →</span>`
 
+  const pages = []
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === pageNum) {
+      pages.push(`<span class="current">${i}</span>`)
+    } else {
+      const href = i === 1 ? '/' : `/page/${i}/`
+      pages.push(`<a href="${href}">${i}</a>`)
+    }
+  }
+  return `<div class="pagination">${prev}${pages.join('')}${next}</div>`
+}
+
+function buildListPage(pageArticles, allDates, pageNum, totalPages) {
   const dateFilterHtml = [
-    `<a href="/" class="active">全部</a>`,
-    ...dates.map(d => `<a href="/date/${d}/">${d}</a>`)
+    `<a href="/" ${pageNum === 1 ? 'class="active"' : ''}>全部</a>`,
+    ...allDates.map(d => `<a href="/date/${d}/">${d}</a>`)
   ].join('\n          ')
 
-  const dateFilter = `<div class="date-filter">${dateFilterHtml}</div>`
-
   let feedHtml = ''
-  articles.forEach((item, i) => {
-    if (i > 0 && item.date !== articles[i - 1].date) {
+  pageArticles.forEach((item, i) => {
+    if (i > 0 && item.date !== pageArticles[i - 1].date) {
       feedHtml += '<div class="section-divider"></div>\n'
     }
     feedHtml += articleCard(item)
   })
+
+  const title = pageNum === 1 ? '凯哥的信息流' : `第 ${pageNum} 页 - 凯哥的信息流`
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>凯哥的信息流</title>
+  <title>${title}</title>
   ${FONT_LINK}
   <style>${CSS}</style>
 </head>
@@ -390,6 +421,7 @@ function buildIndex(articles) {
       <div id="feedList">
         ${feedHtml}
       </div>
+      ${paginationHtml(pageNum, totalPages)}
     </div>
   </main>
   ${footer()}
@@ -600,12 +632,26 @@ function build() {
   const articles = getArticles()
   log(`读取到 ${articles.length} 篇文章`)
 
-  // 生成 index.html
-  fs.writeFileSync(path.join(DIST_DIR, 'index.html'), buildIndex(articles), 'utf-8')
-  log('生成 index.html')
+  const dates = [...new Set(articles.map(a => a.date))].sort().reverse()
+  const totalPages = Math.max(1, Math.ceil(articles.length / PAGE_SIZE))
+
+  // 生成分页列表页
+  fs.mkdirSync(path.join(DIST_DIR, 'page'), { recursive: true })
+  for (let p = 1; p <= totalPages; p++) {
+    const pageArticles = articles.slice((p - 1) * PAGE_SIZE, p * PAGE_SIZE)
+    const html = buildListPage(pageArticles, dates, p, totalPages)
+    if (p === 1) {
+      fs.writeFileSync(path.join(DIST_DIR, 'index.html'), html, 'utf-8')
+      log('生成 index.html')
+    } else {
+      const dir = path.join(DIST_DIR, 'page', String(p))
+      fs.mkdirSync(dir, { recursive: true })
+      fs.writeFileSync(path.join(dir, 'index.html'), html, 'utf-8')
+      log(`生成 page/${p}/index.html`)
+    }
+  }
 
   // 生成日期页
-  const dates = [...new Set(articles.map(a => a.date))].sort().reverse()
   for (const date of dates) {
     const dir = path.join(DIST_DIR, 'date', date)
     fs.mkdirSync(dir, { recursive: true })
@@ -663,7 +709,7 @@ function build() {
   fs.writeFileSync(path.join(DIST_DIR, '404.html'), notFoundHtml, 'utf-8')
   log('生成 404.html')
 
-  log(`\n构建完成，共生成 ${1 + dates.length + articles.length + 1 + Object.keys(tagMap).length} 个 HTML 文件`)
+  log(`\n构建完成，共生成 ${totalPages + dates.length + articles.length + 1 + Object.keys(tagMap).length} 个 HTML 文件`)
 }
 
 build()
