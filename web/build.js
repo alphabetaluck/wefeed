@@ -70,13 +70,11 @@ function getArticles() {
       const { data, content } = matter(fs.readFileSync(filePath, 'utf-8'))
       if (!data.title) return null
       const ctime = getGitCtime(filePath)
-      // date 始终取 git 首次提交时间（即文章被添加到仓库的日期），
-      // 未追踪时降级用目录名 fallbackDate
-      const gitDate = new Date(ctime).toISOString().slice(0, 10)
+      // date 始终取所在目录名（即 articles/YYYY-MM-DD/），目录名即归档日期
       return {
         title: data.title,
         url: data.url || '',
-        date: gitDate || fallbackDate || '',
+        date: fallbackDate || new Date(ctime).toISOString().slice(0, 10),
         source: data.source || '',
         author: data.author || '',
         tags: Array.isArray(data.tags) ? data.tags : [],
