@@ -69,16 +69,20 @@ function getArticles() {
     try {
       const { data, content } = matter(fs.readFileSync(filePath, 'utf-8'))
       if (!data.title) return null
+      const ctime = getGitCtime(filePath)
+      // date 始终取 git 首次提交时间（即文章被添加到仓库的日期），
+      // 未追踪时降级用目录名 fallbackDate
+      const gitDate = new Date(ctime).toISOString().slice(0, 10)
       return {
         title: data.title,
         url: data.url || '',
-        date: formatDate(data.date) || fallbackDate || '',
+        date: gitDate || fallbackDate || '',
         source: data.source || '',
         author: data.author || '',
         tags: Array.isArray(data.tags) ? data.tags : [],
         content: content.trim().replace(/^"""\n?/, '').replace(/\n?"""$/, '').trim(),
         slug: slugify(data.title),
-        ctime: getGitCtime(filePath),
+        ctime,
       }
     } catch (e) {
       console.error(`[error] ${filePath}:`, e.message)
