@@ -338,7 +338,7 @@ function footer() {
   return `
   <footer>
     <div class="container">
-      <span class="footer-text">凯哥的信息流 · 每天读过文章的摘要整理</span>
+      <span class="footer-text">古法信息流 · 每天读过文章的摘要整理</span>
     </div>
   </footer>`
 }
@@ -346,7 +346,7 @@ function footer() {
 function headerLinks(dateFilterHtml = '') {
   return `
       <div class="header-top">
-        <a href="/" class="logo">凯哥的信息流</a>
+        <a href="/" class="logo">古法信息流</a>
         <div class="header-links">
           <a href="/tags/" class="header-link">标签</a>
           <a href="https://x.com/AlphaBetaLuck" class="header-link" target="_blank" rel="noopener">
@@ -397,7 +397,7 @@ function buildListPage(pageArticles, allDates, pageNum, totalPages) {
     feedHtml += articleCard(item)
   })
 
-  const title = pageNum === 1 ? '凯哥的信息流' : `第 ${pageNum} 页 - 凯哥的信息流`
+  const title = pageNum === 1 ? '古法信息流' : `第 ${pageNum} 页 - 古法信息流`
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -448,7 +448,7 @@ function buildDatePage(date, articles, allDates) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${date} - 凯哥的信息流</title>
+  <title>${date} - 古法信息流</title>
   ${FONT_LINK}
   <style>${CSS}</style>
 </head>
@@ -489,7 +489,7 @@ function buildArticlePage(article) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${article.title} - 凯哥的信息流</title>
+  <title>${article.title} - 古法信息流</title>
   ${FONT_LINK}
   <style>${CSS}</style>
 </head>
@@ -560,7 +560,7 @@ function buildTagsIndex(tagMap) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>标签 - 凯哥的信息流</title>
+  <title>标签 - 古法信息流</title>
   ${FONT_LINK}
   <style>${CSS}
   .tags-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
@@ -596,7 +596,7 @@ function buildTagPage(tag, articles) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${tag} - 凯哥的信息流</title>
+  <title>${tag} - 古法信息流</title>
   ${FONT_LINK}
   <style>${CSS}</style>
 </head>
@@ -692,7 +692,7 @@ function build() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>页面不存在 - 凯哥的信息流</title>
+  <title>页面不存在 - 古法信息流</title>
   ${FONT_LINK}
   <style>${CSS}</style>
 </head>
