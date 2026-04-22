@@ -115,20 +115,99 @@ function getArticles() {
 
 function parseMd(text) {
   if (!text) return ''
-  return text
-    .replace(/^### (.+)$/gm, '<h4>$1</h4>')
-    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^# (.+)$/gm, '<h2>$1</h2>')
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/__([^_]+)__/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
-    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-    .replace(/^[\*-] (.+)$/gm, '<li>$1</li>')
-    .replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br>')
+
+  // 行内替换
+  function inline(s) {
+    return s
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/__([^_]+)__/g, '<strong>$1</strong>')
+      .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+  }
+
+  const lines = text.split('\n')
+  const out = []
+  let ulBuf = []   // 无序列表缓冲
+  let olBuf = []   // 有序列表缓冲
+
+  function flushUl() {
+    if (ulBuf.length) {
+      out.push('<ul>' + ulBuf.map(l => `<li>${l}</li>`).join('') + '</ul>')
+      ulBuf = []
+    }
+  }
+  function flushOl() {
+    if (olBuf.length) {
+      out.push('<ol>' + olBuf.map(l => `<li>${l}</li>`).join('') + '</ol>')
+      olBuf = []
+    }
+  }
+
+  for (const raw of lines) {
+    const line = raw
+
+    // 标题
+    const h3 = line.match(/^### (.+)$/)
+    const h2 = line.match(/^## (.+)$/)
+    const h1 = line.match(/^# (.+)$/)
+    if (h3 || h2 || h1) {
+      flushUl(); flushOl()
+      const level = h3 ? 4 : h2 ? 3 : 2
+      const content = h3 ? h3[1] : h2 ? h2[1] : h1[1]
+      out.push(`<h${level}>${inline(content)}</h${level}>`)
+      continue
+    }
+
+    // blockquote
+    const bq = line.match(/^> (.+)$/)
+    if (bq) {
+      flushUl(); flushOl()
+      out.push(`<blockquote>${inline(bq[1])}</blockquote>`)
+      continue
+    }
+
+    // 无序列表
+    const ul = line.match(/^[\*\-] (.+)$/)
+    if (ul) {
+      flushOl()
+      ulBuf.push(inline(ul[1]))
+      continue
+    }
+
+    // 有序列表
+    const ol = line.match(/^(\d+)\. (.+)$/)
+    if (ol) {
+      flushUl()
+      olBuf.push(inline(ol[2]))
+      continue
+    }
+
+    // 空行：结束列表，段落分隔
+    if (line.trim() === '') {
+      flushUl(); flushOl()
+      out.push('')   // 空行标记段落边界
+      continue
+    }
+
+    // 普通段落行
+    flushUl(); flushOl()
+    out.push(inline(line))
+  }
+
+  flushUl(); flushOl()
+
+  // 将连续非空行合并为 <p>，空行分隔段落
+  const chunks = out.join('\n').split(/\n{2,}/)
+  return chunks.map(chunk => {
+    chunk = chunk.trim()
+    if (!chunk) return ''
+    // 已经是块级标签则直接输出
+    if (/^<(h[2-4]|ul|ol|blockquote)/.test(chunk)) return chunk
+    // 普通文本包 <p>，过滤掉段落内的空行
+    const inner = chunk.split('\n').filter(l => l.trim()).join('<br>')
+    return `<p>${inner}</p>`
+  }).filter(Boolean).join('\n')
 }
 
 // ─── HTML 模板 ───────────────────────────────────────────────────────────────
@@ -254,8 +333,8 @@ const CSS = `
     padding-left: 12px; margin: 12px 0;
     color: var(--stone-gray); font-style: italic;
   }
-  .feed-summary ul, .feed-summary ol { margin: 6px 0; padding-left: 1.6em; }
-  .feed-summary li { margin: 3px 0; }
+  .feed-summary ul, .feed-summary ol { margin: 8px 0 8px 1.8em; padding: 0; list-style-position: outside; }
+  .feed-summary li { margin: 4px 0; padding-left: 4px; }
   .article-body {
     background: var(--ivory);
     border: 1px solid var(--border-cream);
@@ -273,8 +352,8 @@ const CSS = `
   .article-body h3 { font-size: 19px; }
   .article-body h4 { font-size: 17px; }
   .article-body strong { color: var(--anthropic-near-black); font-weight: 500; }
-  .article-body ul, .article-body ol { margin: 6px 0; padding-left: 1.6em; }
-  .article-body li { margin: 3px 0; }
+  .article-body ul, .article-body ol { margin: 8px 0 8px 1.8em; padding: 0; list-style-position: outside; }
+  .article-body li { margin: 4px 0; padding-left: 4px; }
   .article-body blockquote {
     border-left: 3px solid var(--terracotta);
     padding-left: 12px; margin: 12px 0;
@@ -558,7 +637,7 @@ function buildArticlePage(article) {
         <div class="feed-tags">${tagsHtml}<span class="feed-date">${article.date}</span></div>
       </div>
       <div class="article-body feed-summary">
-        <p>${bodyHtml}</p>
+        ${bodyHtml}
       </div>
     </div>
   </main>
@@ -586,7 +665,7 @@ function articleCard(item) {
       ${sourceAuthor ? `<span class="feed-source-author">${sourceAuthor}</span>` : ''}
       ${urlHtml}
     </div>
-    <div class="feed-summary"><p>${bodyHtml}</p></div>
+    <div class="feed-summary">${bodyHtml}</div>
     <div class="feed-tags">${tagsHtml}<span class="feed-date">${item.date}</span></div>
   </article>`
 }
