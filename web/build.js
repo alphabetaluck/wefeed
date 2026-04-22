@@ -231,12 +231,59 @@ const CSS = `
   .feed-source-link:hover { color: var(--coral); }
   .feed-source-link::after { content: "↗"; font-size: 11px; }
   .feed-summary { font-size: 15px; line-height: 1.7; color: var(--olive-gray); margin-top: 14px; }
-  .feed-summary p { margin-bottom: 12px; }
+  .feed-summary p { margin-bottom: 10px; }
   .feed-summary p:last-child { margin-bottom: 0; }
   .feed-summary h2, .feed-summary h3, .feed-summary h4 {
     font-family: "Noto Serif SC", Georgia, serif;
-    font-weight: 500; margin: 16px 0 8px;
+    font-weight: 500; margin: 20px 0 4px;
     color: var(--anthropic-near-black);
+  }
+  .feed-summary h2 { font-size: 20px; }
+  .feed-summary h3 { font-size: 18px; }
+  .feed-summary h4 { font-size: 16px; }
+  .feed-summary strong { color: var(--anthropic-near-black); font-weight: 500; }
+  .feed-summary code {
+    font-family: "SF Mono", monospace; font-size: 14px;
+    background: var(--warm-sand); padding: 2px 6px;
+    border-radius: 4px; color: var(--terracotta);
+  }
+  .feed-summary a { color: var(--terracotta); text-decoration: none; }
+  .feed-summary a:hover { text-decoration: underline; }
+  .feed-summary blockquote {
+    border-left: 3px solid var(--terracotta);
+    padding-left: 12px; margin: 12px 0;
+    color: var(--stone-gray); font-style: italic;
+  }
+  .feed-summary ul, .feed-summary ol { margin: 6px 0; padding-left: 1.6em; }
+  .feed-summary li { margin: 3px 0; }
+  .article-body {
+    background: var(--ivory);
+    border: 1px solid var(--border-cream);
+    border-radius: 16px; padding: 32px;
+    font-size: 16px; line-height: 1.8; color: var(--olive-gray);
+  }
+  .article-body p { margin-bottom: 10px; }
+  .article-body p:last-child { margin-bottom: 0; }
+  .article-body h2, .article-body h3, .article-body h4 {
+    font-family: "Noto Serif SC", Georgia, serif;
+    font-weight: 500; margin: 20px 0 4px;
+    color: var(--anthropic-near-black);
+  }
+  .article-body h2 { font-size: 22px; }
+  .article-body h3 { font-size: 19px; }
+  .article-body h4 { font-size: 17px; }
+  .article-body strong { color: var(--anthropic-near-black); font-weight: 500; }
+  .article-body ul, .article-body ol { margin: 6px 0; padding-left: 1.6em; }
+  .article-body li { margin: 3px 0; }
+  .article-body blockquote {
+    border-left: 3px solid var(--terracotta);
+    padding-left: 12px; margin: 12px 0;
+    color: var(--stone-gray); font-style: italic;
+  }
+  .article-body code {
+    font-family: "SF Mono", monospace; font-size: 14px;
+    background: var(--warm-sand); padding: 2px 6px;
+    border-radius: 4px; color: var(--terracotta);
   }
   .feed-summary h2 { font-size: 20px; }
   .feed-summary h3 { font-size: 18px; }
