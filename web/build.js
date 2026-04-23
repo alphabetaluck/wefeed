@@ -19,6 +19,7 @@ const ARTICLES_ROOT = path.resolve(__dirname, '../articles')
 const DIST_DIR = path.resolve(__dirname, '../dist')
 const REPO_ROOT = path.resolve(__dirname, '..')
 const PAGE_SIZE = 15
+const SITE_BASE = 'https://feed.kai.ge'
 
 // ─── 工具函数 ────────────────────────────────────────────────────────────────
 
@@ -836,6 +837,49 @@ function build() {
 </html>`
   fs.writeFileSync(path.join(DIST_DIR, '404.html'), notFoundHtml, 'utf-8')
   log('生成 404.html')
+
+  // 生成 sitemap.xml
+  const today = new Date().toISOString().slice(0, 10)
+  const sitemapUrls = []
+
+  // 首页
+  sitemapUrls.push({ loc: '/', lastmod: today, priority: '1.0', changefreq: 'daily' })
+
+  // 分页列表页
+  for (let p = 2; p <= totalPages; p++) {
+    sitemapUrls.push({ loc: `/page/${p}/`, lastmod: today, priority: '0.8', changefreq: 'daily' })
+  }
+
+  // 文章详情页
+  for (const article of articles) {
+    sitemapUrls.push({ loc: `/article/${article.slug}/`, lastmod: article.date || today, priority: '0.9', changefreq: 'never' })
+  }
+
+  // 日期页
+  for (const date of dates) {
+    sitemapUrls.push({ loc: `/date/${date}/`, lastmod: date, priority: '0.6', changefreq: 'never' })
+  }
+
+  // 标签汇总页
+  sitemapUrls.push({ loc: '/tags/', lastmod: today, priority: '0.7', changefreq: 'weekly' })
+
+  // 各标签页
+  for (const tag of Object.keys(tagMap)) {
+    sitemapUrls.push({ loc: `/tag/${tagSlug(tag)}/`, lastmod: today, priority: '0.6', changefreq: 'weekly' })
+  }
+
+  const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${sitemapUrls.map(u => `  <url>
+    <loc>${SITE_BASE}${u.loc}</loc>
+    <lastmod>${u.lastmod}</lastmod>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`
+
+  fs.writeFileSync(path.join(DIST_DIR, 'sitemap.xml'), sitemapXml, 'utf-8')
+  log('生成 sitemap.xml')
 
   log(`\n构建完成，共生成 ${totalPages + dates.length + articles.length + 1 + Object.keys(tagMap).length} 个 HTML 文件`)
 }
