@@ -264,7 +264,7 @@ const CSS = `
     letter-spacing: -0.02em;
     text-decoration: none;
   }
-  .date-filter { display: flex; gap: 8px; flex-wrap: wrap; }
+  .date-filter { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .date-filter a {
     font-family: "Noto Sans SC", Arial, sans-serif;
     font-size: 14px; padding: 6px 12px;
@@ -276,6 +276,17 @@ const CSS = `
   }
   .date-filter a:hover { background: var(--white); box-shadow: 0 0 0 1px var(--border-warm); }
   .date-filter a.active { background: var(--anthropic-near-black); color: var(--warm-silver); border-color: var(--dark-surface); }
+  .date-filter .date-hidden { display: none; }
+  .date-filter.expanded .date-hidden { display: inline-flex; }
+  .date-toggle {
+    font-size: 13px; padding: 6px 10px;
+    border: 1px dashed var(--border-warm);
+    border-radius: 8px; background: transparent;
+    color: var(--stone-gray); cursor: pointer;
+    transition: all 0.15s ease; white-space: nowrap;
+    font-family: "Noto Sans SC", Arial, sans-serif;
+  }
+  .date-toggle:hover { background: var(--white); color: var(--charcoal-warm); }
   main { padding: 40px 0 80px; }
   .feed-header { margin-bottom: 40px; }
   .feed-title {
@@ -510,11 +521,23 @@ function paginationHtml(pageNum, totalPages) {
   return `<div class="pagination">${prev}${pages.join('')}${next}</div>`
 }
 
+const DATE_FOLD = 5  // 默认展示的日期数量
+
+function dateFilterWidget(allDates, activeDate = null, isAll = false) {
+  const allLink = `<a href="/" ${isAll ? 'class="active"' : ''}>全部</a>`
+  const dateLinks = allDates.map((d, i) => {
+    const cls = [d === activeDate ? 'active' : '', i >= DATE_FOLD ? 'date-hidden' : ''].filter(Boolean).join(' ')
+    return `<a href="/date/${d}/" ${cls ? `class="${cls}"` : ''}>${d}</a>`
+  })
+  const needToggle = allDates.length > DATE_FOLD
+  const toggleBtn = needToggle
+    ? `<button class="date-toggle" onclick="(function(b){var f=b.closest('.date-filter');f.classList.toggle('expanded');b.textContent=f.classList.contains('expanded')?'收起':'更多 ↓'})(this)">更多 ↓</button>`
+    : ''
+  return `<div class="date-filter">${allLink}\n${dateLinks.join('\n')}${needToggle ? '\n' + toggleBtn : ''}</div>`
+}
+
 function buildListPage(pageArticles, allDates, pageNum, totalPages) {
-  const dateFilterHtml = [
-    `<a href="/" ${pageNum === 1 ? 'class="active"' : ''}>全部</a>`,
-    ...allDates.map(d => `<a href="/date/${d}/">${d}</a>`)
-  ].join('\n          ')
+  const dateFilter = dateFilterWidget(allDates, null, true)
 
   let feedHtml = ''
   pageArticles.forEach((item, i) => {
@@ -538,7 +561,7 @@ function buildListPage(pageArticles, allDates, pageNum, totalPages) {
 <body>
   <header>
     <div class="container">
-      ${headerLinks(`<div class="date-filter">${dateFilterHtml}</div>`)}
+      ${headerLinks(dateFilter)}
     </div>
   </header>
   <main>
@@ -562,12 +585,7 @@ function buildListPage(pageArticles, allDates, pageNum, totalPages) {
 
 function buildDatePage(date, articles, allDates) {
   const filtered = articles.filter(a => a.date === date)
-
-  const dateFilterHtml = [
-    `<a href="/">全部</a>`,
-    ...allDates.map(d => `<a href="/date/${d}/" ${d === date ? 'class="active"' : ''}>${d}</a>`)
-  ].join('\n          ')
-
+  const dateFilter = dateFilterWidget(allDates, date, false)
   const feedHtml = filtered.map(item => articleCard(item)).join('\n')
 
   return `<!DOCTYPE html>
@@ -582,7 +600,7 @@ function buildDatePage(date, articles, allDates) {
 <body>
   <header>
     <div class="container">
-      ${headerLinks(`<div class="date-filter">${dateFilterHtml}</div>`)}
+      ${headerLinks(dateFilter)}
     </div>
   </header>
   <main>
